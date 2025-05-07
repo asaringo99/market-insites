@@ -1,6 +1,4 @@
 [workspace]
-members = [
-  "domain",
-  "infrastructure",
-  "presentation",
-]
+resolver = "2"
+
+members = [ "crates/application", "crates/domain", "crates/kernel", "crates/macros"]
