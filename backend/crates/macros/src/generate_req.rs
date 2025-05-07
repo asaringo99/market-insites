@@ -1,11 +1,9 @@
 use proc_macro::TokenStream;
 use quote::quote;
 use syn::{
-    parse_macro_input, Attribute, DeriveInput, Fields, LitStr, Path, Type,
-    Meta,
+    parse_macro_input, Attribute, DeriveInput, LitStr,
 };
 
-/* ---------- attribute helpers ---------- */
 fn lit(attrs:&[Attribute], name:&str, default:Option<&str>) -> String {
     attrs.iter()
         .find(|a| a.path().is_ident(name))
@@ -36,9 +34,9 @@ fn fixed(attrs:&[Attribute]) -> Vec<(String,String)> {
 
 pub fn derive_generate_req(item: TokenStream) -> TokenStream {
     let input   = parse_macro_input!(item as DeriveInput);
-    let wrapper = &input.ident;                 // NaicsReq
+    let wrapper = &input.ident;
 
-    /* 属性 */
+    // 属性
     let endpoint  = lit(&input.attrs, "endpoint", None);
     let method    = lit(&input.attrs, "method", Some("get"));
     let is_get    = method.eq_ignore_ascii_case("get");
@@ -63,12 +61,11 @@ pub fn derive_generate_req(item: TokenStream) -> TokenStream {
         }
     };
 
-    /* 固定 KV を quote */
+    // body(query)部分の取得
     let fixed_ins = fixed_kv.iter().map(|(k,v)| {
         quote!( map.insert(#k.into(), ::serde_json::json!(#v)); )
     });
 
-    /* .query vs .json */
     let call = if is_get {
         quote!(.query(&req))
     } else {
@@ -80,7 +77,6 @@ pub fn derive_generate_req(item: TokenStream) -> TokenStream {
 
         impl ::kernel::core::ReqSpec for #wrapper {}
 
-        /* Serialize – 固定 + VO 由来パラメータ */
         impl ::serde::Serialize for #wrapper {
             fn serialize<S>(&self, se:S)->Result<S::Ok,S::Error>
             where S: ::serde::Serializer {
@@ -91,7 +87,6 @@ pub fn derive_generate_req(item: TokenStream) -> TokenStream {
             }
         }
 
-        /* Into<RequestBuilder> */
         impl From<#wrapper> for reqwest::RequestBuilder {
             fn from(req: #wrapper) -> Self {
                 reqwest::Client::new()
