@@ -1,6 +1,6 @@
 use serde::{de::value, Serialize};
 
-use crate::{valueobject::{ApiColumn, Validatable, ValidationError}, Result};
+use crate::{valueobject::{ApiColumn, Validatable, ValidationError, ValueObject}, Result};
 
 use super::{Naics, NAICS_2DIGIT_CODES};
 
@@ -10,17 +10,23 @@ const NAICS_CODE_LENGTH: usize = 2;
 pub struct NaicsCode(String);
 
 impl NaicsCode {
-	pub fn new(value: String) -> Result<NaicsCode> {
-		let value = Self(value);
-		value.validate()?;
-		Ok(value)
-	}
 	pub fn to_str(&self) -> &str {
 		&self.0
 	}
 	pub fn to_string(&self) -> String {
 		self.0.clone()
 	}
+}
+
+impl ValueObject<String> for NaicsCode {
+	fn new(v: impl Into<String>) -> anyhow::Result<Self> where Self: Sized {
+			let v = Self(v.into());
+			v.validate()?;
+			Ok(v)
+		}
+		fn value(&self) -> String {
+			self.0.clone()
+		}
 }
 
 impl Validatable for NaicsCode {

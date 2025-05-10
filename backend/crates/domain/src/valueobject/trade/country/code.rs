@@ -1,6 +1,6 @@
 use serde::Serialize;
 
-use crate::{valueobject::{ApiColumn, Validatable, ValidationError}, Result};
+use crate::{valueobject::{ApiColumn, Validatable, ValidationError, ValueObject}, Result};
 
 const COUNTRY_CODE_LENGTH: usize = 4;
 
@@ -8,15 +8,19 @@ const COUNTRY_CODE_LENGTH: usize = 4;
 pub struct CountryCode(String);
 
 impl CountryCode {
-	pub fn new(value: impl Into<String>) -> Result<CountryCode> {
-		let v = Self(value.into());
+	pub fn to_string(&self) -> String {
+		self.0.clone()
+	}
+}
+
+impl ValueObject<String> for CountryCode {
+	fn new(v: impl Into<String>) -> anyhow::Result<Self> where Self: Sized {
+		let v = Self(v.into());
 		v.validate()?;
 		Ok(v)
 	}
-	pub fn as_value(&self) -> &str {
-		&self.0.as_str()
-	}
-	pub fn to_string(&self) -> String {
+
+	fn value(&self) -> String {
 		self.0.clone()
 	}
 }

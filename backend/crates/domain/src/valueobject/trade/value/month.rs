@@ -2,18 +2,18 @@ use std::ops::Add;
 
 use serde::Serialize;
 
-use crate::{valueobject::{ApiColumn, Validatable}, Result};
+use crate::{valueobject::{ApiColumn, Validatable, ValueObject}, Result};
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 pub struct MonthValue(u32);
 
-impl MonthValue {
-	pub fn new(value: u32) -> Result<MonthValue> {
-		let value = Self(value);
-		value.validate()?;
-		Ok(value)
+impl ValueObject<u32> for MonthValue {
+	fn new(v: impl Into<u32>) -> anyhow::Result<Self> where Self: Sized {
+		let v = Self(v.into());
+		v.validate()?;
+		Ok(v)
 	}
-	pub fn as_value(&self) -> u32 {
+	fn value(&self) -> u32 {
 		self.0
 	}
 }

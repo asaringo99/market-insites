@@ -23,6 +23,11 @@ pub trait Validatable {
 	fn validate(&self) -> Result<(), ValidationError>;
 }
 
+pub trait ValueObject<T: Into<T>> {
+	fn new(v: impl Into<T>) -> anyhow::Result<Self> where Self: Sized;
+	fn value(&self) -> T;
+}
+
 pub trait ApiColumn: serde::Serialize {
 	const NAME: &'static str;
 }
