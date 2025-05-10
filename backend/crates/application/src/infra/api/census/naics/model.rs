@@ -3,9 +3,7 @@ extern crate macros;
 
 use anyhow::Ok;
 use macros::GenerateReq;
-use serde::Serialize;
-use serde_json::json;
-use crate::{internal::{ReqSpec, ResSpec}, usecase::trade::naics::NaicsUsecaseInput};
+use crate::{internal::{ReqSpec, ResSpec}, usecase::trade::naics::{NaicsUsecaseFetched, NaicsUsecaseInput}};
 
 #[derive(GenerateReq)]
 #[inner(NaicsUsecaseInput)]
@@ -30,6 +28,9 @@ pub struct NaicsRow {
 	pub naics_desc:    String, // NAICS_SDESC
 	pub time:          String, // time (YYYY-MM)
 }
+
+#[derive(GenerateRes)]
+pub struct NaicsRes(pub NaicsUsecaseFetched);
 
 #[async_trait::async_trait]
 impl ResSpec for NaicsRes {
@@ -70,7 +71,7 @@ impl ResSpec for NaicsRes {
 impl kernel::core::ResSpec for NaicsRes {}
 
 mod tests {
-    use domain::valueobject::trade::{country::code::CountryCode, time::YearMonth};
+    use domain::valueobject::{trade::{country::code::CountryCode, time::YearMonth}, ValueObject};
 
     use crate::{infra::api::census::naics::model::{NaicsReq, NaicsRes}, internal::ResSpec, usecase::trade::naics::NaicsUsecaseInput};
 
