@@ -13,6 +13,6 @@ pub trait Pull<Req: ReqSpec, Res: ResSpec> {
 }
 
 #[async_trait::async_trait]
-pub trait Push<T> {
+pub trait Push<S: ResSpec, T: From<S>> {
 	async fn push(&self, items: &[T]) -> anyhow::Result<()>;
 }
